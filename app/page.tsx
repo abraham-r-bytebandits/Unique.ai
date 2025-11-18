@@ -6,6 +6,7 @@ import AppSidebar from './components/Sidebar'
 import ContentArea from './components/ContentArea'
 import CreateBlogPost from './components/CreateBlogPost'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import Header from './components/Header' // Import the Header component
 
 interface AnalysisResult {
   title: string
@@ -230,7 +231,6 @@ function HomeContent({ history, onAddItem }: any) {
 
   return (
     <div className="flex lg:h-screen w-full overflow-hidden">
-
       {/* MOBILE OVERLAY */}
       {isMobile && open && (
         <div
@@ -251,6 +251,9 @@ function HomeContent({ history, onAddItem }: any) {
       {/* MAIN CONTENT WRAPPER */}
       <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${open && !isMobile ? 'lg:ml-64' : 'lg:ml-0'
         }`}>
+        {/* HEADER */}
+        <Header />
+
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] flex-1 gap-6 p-6 overflow-hidden">
 
           {/* MAIN CONTENT COLUMN */}
