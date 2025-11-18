@@ -1,3 +1,4 @@
+// Home.tsx (or wherever HomeContent lives)
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -26,35 +27,32 @@ function HomeContent({ history, onAddItem }: any) {
   const { open, setOpen } = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
   const blogPostSectionRef = useRef<HTMLDivElement>(null)
-  const [isInitialized, setIsInitialized] = useState(false)
+  const prevIsMobileRef = useRef<boolean | null>(null) // track previous breakpoint
 
+  // Track screen width only (runs on mount + resize)
   useEffect(() => {
     const update = () => {
       const mobile = window.innerWidth <= 1024
       setIsMobile(mobile)
-
-      // Close sidebar on mobile when detecting screen size
-      if (mobile && open) {
-        setOpen(false)
-      }
     }
 
     update()
     window.addEventListener("resize", update)
-
-    // Set initialized after first render
-    setIsInitialized(true)
-
     return () => window.removeEventListener("resize", update)
-  }, [open, setOpen])
+  }, [])
 
-  // Initialize sidebar as closed on mobile
+  // CLOSE SIDEBAR ONLY WHEN SWITCHING FROM DESKTOP -> MOBILE
   useEffect(() => {
-    if (isMobile) {
+    const prev = prevIsMobileRef.current
+    if (prev === false && isMobile === true) {
+      // we just crossed from desktop -> mobile, close it
       setOpen(false)
     }
+    // initialize prev/ref for next change
+    prevIsMobileRef.current = isMobile
   }, [isMobile, setOpen])
 
+  // Toggle main sidebar using functional updater (defensive)
   const toggleSidebar = () => setOpen(!open)
 
   const scrollToBlogPost = () => {
@@ -75,7 +73,7 @@ function HomeContent({ history, onAddItem }: any) {
       {isMobile && open && (
         <div
           className="fixed inset-0 bg-black/40 z-40"
-          onClick={toggleSidebar}
+          onClick={() => setOpen(false)}   // always close, don't toggle
         />
       )}
 
@@ -101,10 +99,8 @@ function HomeContent({ history, onAddItem }: any) {
         </div>
 
         <main className="flex-1 overflow-y-auto">
-          {/* Content Area Section */}
           <ContentArea onNavigateToBlogPost={scrollToBlogPost} />
 
-          {/* Blog Post Section - will be scrolled to when clicking Create Content */}
           <div ref={blogPostSectionRef}>
             <CreateBlogPost />
           </div>

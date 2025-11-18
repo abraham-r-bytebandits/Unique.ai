@@ -60,17 +60,6 @@ export default function AppSidebar({
                 </div>
                 <span className="text-lg font-semibold text-white">Unicq.ai</span>
               </div>
-              {isMobile && (
-                <button
-                  onClick={onToggle}
-                  className="p-1 rounded-md hover:bg-white/10 transition-colors text-white"
-                  aria-label="Close menu"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
             </div>
           </div>
 

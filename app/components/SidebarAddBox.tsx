@@ -1,3 +1,4 @@
+// SidebarAddBox.tsx
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
@@ -12,7 +13,7 @@ interface SidebarAddBoxProps {
     onToggleSidebar: () => void
 }
 
-const GAP = -10
+const GAP = 8
 const BUTTON_BOX = 48
 const HISTORY_WIDTH = 240
 
@@ -57,21 +58,24 @@ export default function SidebarAddBox({
         setOpenHistory(false)
     }
 
+    // defensive: stop propagation + preventDefault, then toggle via parent
     const handleToggleMainSidebar = (e: React.MouseEvent) => {
+        e.preventDefault()
         e.stopPropagation()
         onToggleSidebar()
     }
 
+    // ⬅⬅⬅ UPDATED POSITION LOGIC (IMPORTANT)
     const floatingStyle: React.CSSProperties = {
-        left: isMainSidebarOpen
-            ? `${sidebarWidth + GAP}px`
-            : `${GAP}px`,
+        left: openHistory
+            ? `${sidebarWidth + HISTORY_WIDTH + GAP}px`   // button shifts to outside of history drawer
+            : isMainSidebarOpen
+                ? `${sidebarWidth + GAP}px`               // button sits next to main sidebar
+                : `${GAP}px`,                             // default position
     }
 
     const panelStyle: React.CSSProperties = {
-        left: isMainSidebarOpen
-            ? `${sidebarWidth}px`
-            : `0px`,
+        left: `${sidebarWidth}px`,
         width: `${HISTORY_WIDTH}px`,
     }
 
@@ -86,21 +90,26 @@ export default function SidebarAddBox({
                 }}
             >
                 <div
-                    className="flex flex-col gap-3 bg-white border p-3 rounded-xl shadow-xl items-center"
-                    style={{ width: BUTTON_BOX, height: 110 }}
+                    className="flex flex-col gap-1 bg-white border p-2 rounded-xl shadow-xl items-center"
+                    style={{ width: BUTTON_BOX, height: 90 }}
                 >
                     <button
                         onClick={handleToggleMainSidebar}
                         className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200"
+                        aria-label="Toggle sidebar"
                     >
-                        <PanelLeft className="h-5 w-5" />
+                        <PanelLeft className="h-4 w-4" />
                     </button>
 
                     <button
-                        onClick={() => setOpenHistory(true)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setOpenHistory(true)
+                        }}
                         className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200"
+                        aria-label="Open history"
                     >
-                        <Plus className="h-5 w-5" />
+                        <Plus className="h-4 w-4" />
                     </button>
                 </div>
             </div>
@@ -124,12 +133,6 @@ export default function SidebarAddBox({
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 border-b">
                         <h3 className="text-sm font-semibold">History</h3>
-                        <button
-                            onClick={() => setOpenHistory(false)}
-                            className="p-1 rounded-md hover:bg-gray-100"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
                     </div>
 
                     {/* Saved Items */}
@@ -170,7 +173,6 @@ export default function SidebarAddBox({
 
                 </div>
             </div>
-
 
             {/* Overlay for history on mobile */}
             {isMobile && openHistory && (
