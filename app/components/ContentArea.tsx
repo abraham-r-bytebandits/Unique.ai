@@ -4,7 +4,6 @@ import { useState, ChangeEvent, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { FiChevronUp } from "react-icons/fi";
 
 interface AnalysisResult {
   title: string
@@ -347,7 +346,7 @@ export default function ContentArea({ onNavigateToBlogPost }: ContentAreaProps) 
                         <button
                           type="button"
                           aria-label="Scroll to top"
-                          onClick={handleScrollToTop}
+                          onClick={handleDecode}
                           className="
         absolute
         bottom-3
