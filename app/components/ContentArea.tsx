@@ -17,9 +17,10 @@ interface AnalysisResult {
 
 interface ContentAreaProps {
   onNavigateToBlogPost: () => void
+  onAnalysisComplete?: (analysis: AnalysisResult) => void
 }
 
-export default function ContentArea({ onNavigateToBlogPost }: ContentAreaProps) {
+export default function ContentArea({ onNavigateToBlogPost, onAnalysisComplete }: ContentAreaProps) {
   const [text, setText] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -40,13 +41,8 @@ export default function ContentArea({ onNavigateToBlogPost }: ContentAreaProps) 
     setWordCount(count)
   }
 
-  const handleScrollToTop = () => {
-    if (textareaRef.current) {
-      textareaRef.current.scrollTop = 0
-    }
-  }
-
   const analyzeText = (content: string): AnalysisResult => {
+    // ... (keep your existing analyzeText function)
     const words = content.toLowerCase().split(/\s+/)
     const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0)
 
@@ -153,186 +149,35 @@ export default function ContentArea({ onNavigateToBlogPost }: ContentAreaProps) 
       setDocumentTitle(result.title)
       setAnalysis(result)
       setIsProcessing(false)
+
+      // Pass analysis data to parent
+      if (onAnalysisComplete) {
+        onAnalysisComplete(result)
+      }
     }, 1500)
   }
 
-  // Analysis Panel Component
-  const AnalysisPanel = () => {
-    if (!analysis) {
-      return (
-        <Card className="bg-gray-100 border-gray-200 hidden flex-shrink-0">
-          <CardContent className="p-6 flex items-center justify-center h-64">
-            <div className="text-center text-gray-400">
-              <div className="text-lg font-medium mb-2">Analysis Panel</div>
-              <div className="text-sm">Enter text and click "Decode My DNA" to see analysis results</div>
-            </div>
-          </CardContent>
-        </Card>
-      )
-    }
-
-    return (
-      <div className="flex-shrink-0 p-4">
-        <CardContent className="space-y-4">
-          <AnalysisRow icon="/tick.png" label="Tone" value={analysis.tone} />
-          <AnalysisRow icon="/tick.png" label="Emotion" value={analysis.emotion} />
-          <AnalysisRow icon="/tick.png" label="Confidence" value={`${analysis.confidence}%`} />
-          <AnalysisRow icon="/tick.png" label="Syntax" value={analysis.syntax} />
-          <AnalysisRow icon="/tick.png" label="Formality" value={analysis.formality} />
-
-          <div className="flex justify-between">
-            <div className="flex items-start gap-2">
-              <img src="/tick.png" alt="tick" className="w-5 h-5 mt-0.5" />
-              <span className="font-medium">Keywords</span>
-            </div>
-            <div className="flex-1 flex justify-center">
-              <span className="text-muted-foreground">-</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <ul className="list-disc list-inside text-sm">
-                {analysis.keywords.map((keyword, idx) => (
-                  <li key={idx} className="text-muted-foreground">{keyword}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-
-        <div className="p-[3px] rounded-xl bg-gradient-to-r from-[#0015FF] to-[#FF0000]">
-          <button
-            className="max-h-[57px] h-full w-full rounded-xl bg-gradient-to-r from-[#D0D3FF] to-[#FFDADA] text-[16px] lg:text-[20px] text-black font-medium px-6 py-3"
-            onClick={onNavigateToBlogPost}
-          >
-            Create Content
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  // Analysis Row Component
-  const AnalysisRow = ({ icon, label, value }: { icon: string; label: string; value: string }) => (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2 flex-1">
-        <img src={icon} alt="tick" className="w-5 h-5" />
-        <span className="font-medium">{label}</span>
-      </div>
-      <div className="flex-1 flex justify-center">
-        <span className="text-muted-foreground">-</span>
-      </div>
-      <div className="flex items-center gap-2 flex-1 justify-end">
-        <span className="font-semibold">{value}</span>
-      </div>
-    </div>
-  )
-
-  // Assistant Panel Component
-  const AssistantPanel = () => {
-    if (!isAssistantOpen) return null
-
-    return (
-      <div
-        className="fixed inset-0 z-50 flex justify-end p-4 bg-black bg-opacity-50 backdrop-blur-sm"
-        onClick={() => setIsAssistantOpen(false)}
-      >
-        <div className="flex items-start" onClick={(e) => e.stopPropagation()}>
-          <span
-            className="text-black text-lg font-medium cursor-pointer mr-2 mt-4 hover:opacity-80 transition-opacity"
-            onClick={() => setIsAssistantOpen(false)}
-          >
-            &gt;&gt;
-          </span>
-
-          <div className="flex flex-col h-full">
-            <Card className="w-full md:max-w-[477px] lg:w-[477px] h-full overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between border-b">
-                <div className="flex space-x-4">
-                  <CardTitle
-                    className={`cursor-pointer pb-2 ${activeTab === 'plagiarism' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}
-                    onClick={() => setActiveTab('plagiarism')}
-                  >
-                    Plagiarism Checker
-                  </CardTitle>
-                  <CardTitle
-                    className={`cursor-pointer pb-2 ${activeTab === 'humaniser' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}
-                    onClick={() => setActiveTab('humaniser')}
-                  >
-                    Humaniser
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="h-[calc(100%-80px)] overflow-auto p-6">
-                <div className="flex flex-col h-full">
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <div className="flex justify-center items-center mb-6">
-                      <img src="/chat.png" alt="Assistant" className="w-32 h-32" />
-                    </div>
-
-                    <div className="text-center mb-8">
-                      <h2 className="text-2xl font-bold mb-4">
-                        {activeTab === 'plagiarism' ? 'Nothing To Check Yet !' : 'Nothing To Check Yet !'}
-                      </h2>
-                      <p className="text-muted-foreground max-w-md mx-auto">
-                        {activeTab === 'plagiarism'
-                          ? 'Get Started by Generating something'
-                          : 'Get Started by Generating something'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="w-full max-w-md mx-auto mt-auto pt-6">
-                    <div className="flex items-center gap-3">
-                      <p className="text-sm text-muted-foreground whitespace-nowrap">Waiting for words..</p>
-                      <div className="flex-1 border-b border-gray-300">
-                        <input
-                          type="text"
-                          className="w-full p-2 bg-transparent border-none focus:outline-none focus:ring-0"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="pt-6">
-              <div className="p-[3px] rounded-xl bg-gradient-to-r from-[#0015FF] to-[#FF0000] w-full">
-                <button className="max-h-[57px] h-full w-full rounded-xl bg-white text-[16px] lg:text-[20px] text-black font-medium px-6 py-3 text-center">
-                  Generate Content
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className={`min-h-screen bg-white text-gray-900 ${isAssistantOpen ? 'overflow-hidden' : ''}`}>
+    <div className={`bg-white text-gray-900 ${isAssistantOpen ? 'overflow-hidden' : ''}`}>
       <div className={`${isAssistantOpen ? 'blur-sm pointer-events-none' : ''} transition-all duration-300`}>
-        <div className="flex min-h-screen">
-          <main className="flex-1 p-6 flex justify-center">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full">
-
-              {/* CENTER MAIN CONTENT */}
-              <div className="lg:col-span-2 space-y-6">
+        <div className="flex lg:min-h-screen">
+          <main className="flex-1 md:p-6 flex justify-center">
+            <div className="w-full max-w-7xl">
+              <div className="space-y-6">
                 <div>
-                  <CardHeader>
-                    <CardDescription className="text- font-bold text-[#737373]">{documentTitle}</CardDescription>
-                    <CardTitle className="text-[20px] md:text-[30px] lg:text-[40px] xl:text-[50px] ">Create Authentic Content</CardTitle>
+                  <CardHeader className='px-0 lg:px-6'>
+                    <CardDescription className="text-sm md:text-base font-bold text-[#737373] text-left">{documentTitle}</CardDescription>
+                    <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] text-left">Create Authentic Content</CardTitle>
                   </CardHeader>
 
-                  <CardContent className="space-y-6">
-                    <p className="text-[14px] md:text-[16px] lg:text-[18px] text-[#333333]">
+                  <CardContent className="space-y-6 px-0 lg:px-6">
+                    <p className="text-[14px] md:text-[16px] lg:text-[18px] text-[#333333] text-left">
                       Paste a sample of your own writing{" "}
-                      <span className="text-[#3964FE] font-medium">(minimum 40 words)</span>.<br />
+                      <span className="text-[#3964FE] font-medium">(minimum 40 words)</span>.<br className="hidden md:block" />
                       The more you provide, the more accurately we can emulate your unique style.
                     </p>
 
                     <div className="relative space-y-4">
-
-                      {/* Wrap the textarea in a relative container */}
                       <div className="relative">
                         <Textarea
                           placeholder="Start typing or paste your content here..."
@@ -342,26 +187,25 @@ export default function ContentArea({ onNavigateToBlogPost }: ContentAreaProps) 
                           ref={textareaRef}
                         />
 
-                        {/* Up-arrow button INSIDE the textarea */}
                         <button
                           type="button"
                           aria-label="Scroll to top"
                           onClick={handleDecode}
                           className="
-        absolute
-        bottom-3
-        right-3
-        h-8
-        w-8
-        rounded-full
-        flex
-        items-center
-        justify-center
-        shadow-[0_6px_18px_rgba(57,100,254,0.22)]
-        transition-transform
-        hover:scale-105
-        active:scale-95
-      "
+                            absolute
+                            bottom-3
+                            right-3
+                            h-8
+                            w-8
+                            rounded-full
+                            flex
+                            items-center
+                            justify-center
+                            shadow-[0_6px_18px_rgba(57,100,254,0.22)]
+                            transition-transform
+                            hover:scale-105
+                            active:scale-95
+                          "
                           style={{ backgroundColor: "#3964FE", color: "#FFFFFF" }}
                         >
                           <svg
@@ -386,70 +230,37 @@ export default function ContentArea({ onNavigateToBlogPost }: ContentAreaProps) 
                       </div>
                     </div>
 
-
-                    <p className="text-sm text-[#737373]">
+                    <p className="text-sm text-[#737373] text-left">
                       <span className='text-[#000000]'>Note:</span> Your writing sample is used solely to create your personal style profile.
                       We do not store or use it for any other purpose.
                     </p>
 
-                    <Button
-                      onClick={handleDecode}
-                      disabled={isProcessing}
-                      className="w-full max-w-[405px] bg-[#3964FE] py-6 text-lg"
-                    >
-                      {isProcessing ? (
-                        <div className="flex items-center gap-2">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                          Processing...
-                        </div>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          Decode My DNA
-                          <img src="/star.png" alt="dna icon" className="w-5 h-5 object-contain" />
-                        </span>
-                      )}
-                    </Button>
+                    <div className="flex justify-center lg:justify-start">
+                      <Button
+                        onClick={handleDecode}
+                        disabled={isProcessing}
+                        className="w-full max-w-[405px] bg-[#3964FE] py-6 text-lg"
+                      >
+                        {isProcessing ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            Processing...
+                          </div>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            Decode My DNA
+                            <img src="/star.png" alt="dna icon" className="w-5 h-5 object-contain" />
+                          </span>
+                        )}
+                      </Button>
+                    </div>
                   </CardContent>
                 </div>
-
-                <Card className="bg-[#D9D9D9] h-full max-h-[260px] hidden lg:block border-gray-200">
-                  <CardContent className="p-6">
-                    <div className="text-center text-gray-500"></div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* RIGHT SIDEBAR */}
-              <div className="space-y-6 flex flex-col">
-                <Card
-                  className="border-border cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => setIsAssistantOpen(true)}
-                >
-                  <CardContent className="p-3 flex items-center justify-center">
-                    <span className="text-sm text-center font-medium">&lt;&lt; Open assistant</span>
-                  </CardContent>
-                </Card>
-
-                <AnalysisPanel />
-
-                <Card className="bg-[#D9D9D9] border-gray-200 h-full">
-                  <CardContent className="p-6 h-full">
-                    <div className="text-center text-gray-500 h-full flex items-center justify-center"></div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-[#D9D9D9] h-full max-h-[260px] block lg:hidden border-gray-200">
-                  <CardContent className="p-6">
-                    <div className="text-center text-gray-500"></div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </main>
         </div>
       </div>
-
-      <AssistantPanel />
     </div>
   )
 }

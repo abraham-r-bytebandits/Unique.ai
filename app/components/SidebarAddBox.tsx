@@ -13,7 +13,7 @@ interface SidebarAddBoxProps {
     onToggleSidebar: () => void
 }
 
-const GAP = 8
+const GAP = 2
 const BUTTON_BOX = 48
 const HISTORY_WIDTH = 240
 
