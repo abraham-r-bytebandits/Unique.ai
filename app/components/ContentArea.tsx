@@ -4,6 +4,8 @@ import { useState, ChangeEvent, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner";
+
 
 interface AnalysisResult {
   title: string
@@ -132,28 +134,30 @@ export default function ContentArea({
 
   const handleDecode = () => {
     if (!text.trim()) {
-      alert('Please enter some text before decoding your DNA.')
-      return
+      toast.error("Please enter some text before decoding your DNA.");
+      return;
     }
 
     if (wordCount < 40) {
-      alert('Please provide at least 40 words for better analysis.')
-      return
+      toast.error("Please provide at least 40 words for better analysis.");
+      return;
     }
 
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     setTimeout(() => {
-      const result = analyzeText(text)
-      setDocumentTitle(result.title)
-      setIsProcessing(false)
+      const result = analyzeText(text);
+      setDocumentTitle(result.title);
+      setIsProcessing(false);
 
-      // Pass analysis data to parent
       if (onAnalysisComplete) {
-        onAnalysisComplete(result)
+        onAnalysisComplete(result);
       }
-    }, 1500)
-  }
+
+      toast.success("Analysis complete!");
+    }, 1500);
+  };
+
 
   return (
     <div className="bg-white text-gray-900">
@@ -164,7 +168,7 @@ export default function ContentArea({
               <div>
                 <CardHeader className='px-0 lg:px-6'>
                   <CardDescription className="text-sm md:text-base font-bold text-[#737373] text-left">{documentTitle}</CardDescription>
-                  <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] text-left">Create Authentic Content</CardTitle>
+                  <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] font-medium text-left">Create Authentic Content</CardTitle>
                 </CardHeader>
 
                 <CardContent className="space-y-6 px-0 lg:px-6">
@@ -180,7 +184,7 @@ export default function ContentArea({
                         placeholder="Start typing or paste your content here..."
                         value={text}
                         onChange={handleTextChange}
-                        className="min-h-[200px] resize-none text-base p-4 pr-12"
+                        className="min-h-[200px] resize-none text-base p-4 pr-12 border border-black focus:border-black focus:ring-0"
                         ref={textareaRef}
                       />
 

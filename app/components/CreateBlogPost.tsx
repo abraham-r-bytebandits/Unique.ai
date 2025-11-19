@@ -236,23 +236,42 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
                                         <div className="flex flex-col lg:flex-row w-full gap-6">
                                             {/* Blog Title Input */}
                                             <div className="flex-1">
-                                                <CardTitle className="text-2xl md:text-3xl text-left">Create Your Blog Post</CardTitle>
-                                                <h3 className="text-base md:text-lg font-medium text-gray-800 mb-2 mt-4 md:mt-6 text-left">
-                                                    What should we call your Blog?
-                                                </h3>
-                                                <input
-                                                    ref={blogTitleRef}
-                                                    value={blogTitleInput}
-                                                    onChange={(e) => setBlogTitleInput(e.target.value)}
-                                                    placeholder="Enter Topic (e.g. The Future is Bytebandits)..."
-                                                    className="w-full rounded-md border border-gray-300 px-4 py-3 placeholder-gray-400 
-                            focus:outline-none focus:ring-2 focus:ring-[#3964FE] text-base"
-                                                />
+                                                <CardTitle className="text-2xl md:text-3xl text-left">
+                                                    Create Your Blog Post
+                                                </CardTitle>
+
+                                                {/* Heading Row */}
+                                                <div className="flex items-center justify-between mb-2 mt-4 md:mt-6">
+                                                    <h3 className="text-base md:text-lg font-medium text-gray-800 text-left">
+                                                        What should we call your Blog?
+                                                    </h3>
+                                                </div>
+
+                                                {/* Input + half-overlapping Button */}
+                                                <div className="relative w-full">
+                                                    <input
+                                                        ref={blogTitleRef}
+                                                        value={blogTitleInput}
+                                                        onChange={(e) => setBlogTitleInput(e.target.value)}
+                                                        placeholder="Enter Topic (e.g. The Future is Bytebandits)..."
+                                                        className="w-full rounded-md border border-gray-300 px-4 py-3 pr-28 placeholder-gray-400
+          focus:outline-none focus:ring-2 focus:ring-[#3964FE] text-base"
+                                                    />
+
+                                                    <button
+                                                        className="absolute right-2 -top-9 translate-y-1/2 
+          inline-flex items-center gap-2 px-5 py-2 rounded-md 
+          bg-[#3964FE] text-white text-sm hover:shadow-md"
+                                                    >
+                                                        Generate
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* Tone Selector */}
                                             <ToneSelector />
                                         </div>
+
                                     </CardHeader>
 
                                     <CardContent className="space-y-6 px-0 lg:px-6">

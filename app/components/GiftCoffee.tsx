@@ -30,7 +30,7 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
                 <div className="flex-1">
 
                     <CardHeader className="px-0">
-                        <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px]">
+                        <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] font-medium xl:text-[50px]">
                             Gift a cup of Coffee
                         </CardTitle>
                     </CardHeader>
