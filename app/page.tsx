@@ -249,7 +249,7 @@ function HomeContent({ history, onAddItem }: any) {
       />
 
       {/* MAIN CONTENT WRAPPER */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${open && !isMobile ? 'lg:ml-64' : 'lg:ml-0'
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${open && !isMobile ? 'lg:ml-64' : 'lg:ml-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
         }`}>
         {/* HEADER */}
         <Header />
@@ -259,7 +259,7 @@ function HomeContent({ history, onAddItem }: any) {
           {/* MAIN CONTENT COLUMN */}
           <div className="flex flex-col min-h-0">
             {/* Scrollable content area */}
-            <div className="flex-1 space-y-6 overflow-y-auto">
+            <div className="flex-1 space-y-6 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {/* Content Writing Area */}
               <ContentArea
                 onNavigateToBlogPost={scrollToBlogPost}
@@ -281,7 +281,7 @@ function HomeContent({ history, onAddItem }: any) {
                 <AnalysisPanel />
 
                 {/* Empty Container Card - AT THE BOTTOM */}
-                <Card className="bg-[#D9D9D9] border-gray-200 h-[160px] flex-1 min-h-0">
+                <Card className="bg-[#D9D9D9] border-gray-200 mt-6 lg:mt-0 h-[160px] flex-1 min-h-0">
                   <CardContent className="p-6 h-full">
                     <div className="text-center text-gray-500 h-full flex items-center justify-center">
                       {/* Right sidebar content */}
