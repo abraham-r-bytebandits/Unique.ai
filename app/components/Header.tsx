@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 
 export default function Header() {
   return (
-    <header className="flex h-16 items-center justify-around border-b border-border gap-14 bg-background md:px-6 w-full">
+    <header className="flex h-16 items-center justify-around border-b border-border gap-8 bg-background md:px-6 w-full">
       {/* Left spacer for balance */}
       <div className="flex-1"></div>
 
@@ -13,7 +13,7 @@ export default function Header() {
       </div>
 
       {/* Right-aligned Buttons */}
-      <div className="flex-1 flex justify-end items-center gap-2">
+      <div className="flex-1 flex justify-end items-center gap-2 px-4">
         <Button variant="ghost" className="text-sm hidden md:block">
           How to Use
         </Button>

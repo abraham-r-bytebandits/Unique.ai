@@ -20,14 +20,14 @@ interface ContentAreaProps {
   onAnalysisComplete?: (analysis: AnalysisResult) => void
 }
 
-export default function ContentArea({ onNavigateToBlogPost, onAnalysisComplete }: ContentAreaProps) {
+export default function ContentArea({
+  onNavigateToBlogPost,
+  onAnalysisComplete,
+}: ContentAreaProps) {
   const [text, setText] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
   const [documentTitle, setDocumentTitle] = useState('Untitled document')
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState('plagiarism')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -42,7 +42,6 @@ export default function ContentArea({ onNavigateToBlogPost, onAnalysisComplete }
   }
 
   const analyzeText = (content: string): AnalysisResult => {
-    // ... (keep your existing analyzeText function)
     const words = content.toLowerCase().split(/\s+/)
     const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0)
 
@@ -147,7 +146,6 @@ export default function ContentArea({ onNavigateToBlogPost, onAnalysisComplete }
     setTimeout(() => {
       const result = analyzeText(text)
       setDocumentTitle(result.title)
-      setAnalysis(result)
       setIsProcessing(false)
 
       // Pass analysis data to parent
@@ -158,108 +156,106 @@ export default function ContentArea({ onNavigateToBlogPost, onAnalysisComplete }
   }
 
   return (
-    <div className={`bg-white text-gray-900 ${isAssistantOpen ? 'overflow-hidden' : ''}`}>
-      <div className={`${isAssistantOpen ? 'blur-sm pointer-events-none' : ''} transition-all duration-300`}>
-        <div className="flex lg:min-h-screen">
-          <main className="flex-1 md:p-6 flex justify-center">
-            <div className="w-full max-w-7xl">
-              <div className="space-y-6">
-                <div>
-                  <CardHeader className='px-0 lg:px-6'>
-                    <CardDescription className="text-sm md:text-base font-bold text-[#737373] text-left">{documentTitle}</CardDescription>
-                    <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] text-left">Create Authentic Content</CardTitle>
-                  </CardHeader>
+    <div className="bg-white text-gray-900">
+      <div className="flex lg:min-h-screen">
+        <main className="flex-1 md:p-6 flex justify-center">
+          <div className="w-full max-w-7xl">
+            <div className="space-y-6">
+              <div>
+                <CardHeader className='px-0 lg:px-6'>
+                  <CardDescription className="text-sm md:text-base font-bold text-[#737373] text-left">{documentTitle}</CardDescription>
+                  <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] text-left">Create Authentic Content</CardTitle>
+                </CardHeader>
 
-                  <CardContent className="space-y-6 px-0 lg:px-6">
-                    <p className="text-[14px] md:text-[16px] lg:text-[18px] text-[#333333] text-left">
-                      Paste a sample of your own writing{" "}
-                      <span className="text-[#3964FE] font-medium">(minimum 40 words)</span>.<br className="hidden md:block" />
-                      The more you provide, the more accurately we can emulate your unique style.
-                    </p>
+                <CardContent className="space-y-6 px-0 lg:px-6">
+                  <p className="text-[14px] md:text-[16px] lg:text-[18px] text-[#333333] text-left">
+                    Paste a sample of your own writing{" "}
+                    <span className="text-[#3964FE] font-medium">(minimum 40 words)</span>.<br className="hidden md:block" />
+                    The more you provide, the more accurately we can emulate your unique style.
+                  </p>
 
-                    <div className="relative space-y-4">
-                      <div className="relative">
-                        <Textarea
-                          placeholder="Start typing or paste your content here..."
-                          value={text}
-                          onChange={handleTextChange}
-                          className="min-h-[200px] resize-none text-base p-4 pr-12"
-                          ref={textareaRef}
-                        />
+                  <div className="relative space-y-4">
+                    <div className="relative">
+                      <Textarea
+                        placeholder="Start typing or paste your content here..."
+                        value={text}
+                        onChange={handleTextChange}
+                        className="min-h-[200px] resize-none text-base p-4 pr-12"
+                        ref={textareaRef}
+                      />
 
-                        <button
-                          type="button"
-                          aria-label="Scroll to top"
-                          onClick={handleDecode}
-                          className="
-                            absolute
-                            bottom-3
-                            right-3
-                            h-8
-                            w-8
-                            rounded-full
-                            flex
-                            items-center
-                            justify-center
-                            shadow-[0_6px_18px_rgba(57,100,254,0.22)]
-                            transition-transform
-                            hover:scale-105
-                            active:scale-95
-                          "
-                          style={{ backgroundColor: "#3964FE", color: "#FFFFFF" }}
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="18 15 12 9 6 15" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <p className={`text-sm font-medium ${wordCount >= 40 && wordCount <= 150 ? "text-green-600" : "text-red-600"}`}>
-                          {wordCount} / 150 words
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-[#737373] text-left">
-                      <span className='text-[#000000]'>Note:</span> Your writing sample is used solely to create your personal style profile.
-                      We do not store or use it for any other purpose.
-                    </p>
-
-                    <div className="flex justify-center lg:justify-start">
-                      <Button
+                      <button
+                        type="button"
+                        aria-label="Scroll to top"
                         onClick={handleDecode}
-                        disabled={isProcessing}
-                        className="w-full max-w-[405px] bg-[#3964FE] py-6 text-lg"
+                        className="
+                          absolute
+                          bottom-3
+                          right-3
+                          h-8
+                          w-8
+                          rounded-full
+                          flex
+                          items-center
+                          justify-center
+                          shadow-[0_6px_18px_rgba(57,100,254,0.22)]
+                          transition-transform
+                          hover:scale-105
+                          active:scale-95
+                        "
+                        style={{ backgroundColor: "#3964FE", color: "#FFFFFF" }}
                       >
-                        {isProcessing ? (
-                          <div className="flex items-center gap-2">
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                            Processing...
-                          </div>
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            Decode My DNA
-                            <img src="/star.png" alt="dna icon" className="w-5 h-5 object-contain" />
-                          </span>
-                        )}
-                      </Button>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="18 15 12 9 6 15" />
+                        </svg>
+                      </button>
                     </div>
-                  </CardContent>
-                </div>
+
+                    <div className="flex justify-between items-center">
+                      <p className={`text-sm font-medium ${wordCount >= 40 && wordCount <= 150 ? "text-green-600" : "text-red-600"}`}>
+                        {wordCount} / 150 words
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-[#737373] text-left">
+                    <span className='text-[#000000]'>Note:</span> Your writing sample is used solely to create your personal style profile.
+                    We do not store or use it for any other purpose.
+                  </p>
+
+                  <div className="flex justify-center lg:justify-start">
+                    <Button
+                      onClick={handleDecode}
+                      disabled={isProcessing}
+                      className="w-full max-w-[405px] bg-[#3964FE] py-6 text-lg"
+                    >
+                      {isProcessing ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          Processing...
+                        </div>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          Decode My DNA
+                          <img src="/star.png" alt="dna icon" className="w-5 h-5 object-contain" />
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
               </div>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   )

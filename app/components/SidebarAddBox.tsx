@@ -14,7 +14,7 @@ interface SidebarAddBoxProps {
 }
 
 const GAP = 2
-const BUTTON_BOX = 48
+const BUTTON_BOX = 40
 const HISTORY_WIDTH = 240
 
 export default function SidebarAddBox({
@@ -94,7 +94,10 @@ export default function SidebarAddBox({
                     style={{ width: BUTTON_BOX, height: 90 }}
                 >
                     <button
-                        onClick={handleToggleMainSidebar}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setOpenHistory(true)
+                        }}
                         className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200"
                         aria-label="Toggle sidebar"
                     >
@@ -102,10 +105,6 @@ export default function SidebarAddBox({
                     </button>
 
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setOpenHistory(true)
-                        }}
                         className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200"
                         aria-label="Open history"
                     >

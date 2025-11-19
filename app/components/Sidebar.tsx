@@ -1,6 +1,6 @@
 'use client'
 
-import { User } from "lucide-react"
+import { User, PanelLeft } from "lucide-react"
 import SidebarAddBox from "./SidebarAddBox"
 
 interface AppSidebarProps {
@@ -9,6 +9,7 @@ interface AppSidebarProps {
   onAddItem: (newItem: string) => void
   isMobile: boolean
   onToggle: () => void
+  onOpenAssistant: (type: 'plagiarism' | 'humanizer') => void
 }
 
 export default function AppSidebar({
@@ -17,9 +18,23 @@ export default function AppSidebar({
   onAddItem,
   isMobile,
   onToggle,
+  onOpenAssistant,
 }: AppSidebarProps) {
 
   const sidebarWidth = isMobile ? 256 : 288
+
+  const handleProductClick = (label: string) => {
+    console.log('Product clicked:', label)
+
+    if (label === "Plagiarism Checker") {
+      onOpenAssistant('plagiarism')
+      if (isMobile) onToggle()
+    }
+    else if (label === "Humanizer") {
+      onOpenAssistant('humanizer')
+      if (isMobile) onToggle()
+    }
+  }
 
   return (
     <>
@@ -32,7 +47,18 @@ export default function AppSidebar({
         />
       )}
 
-      {/* Custom Sidebar */}
+      {/* Menu Button outside sidebar */}
+      {!isOpen && (
+        <button
+          onClick={onToggle}
+          className="fixed top-4 left-4 z-50 p-2 rounded-md bg-[#1A1F35] text-white hover:bg-[#2D3748] transition-colors shadow-lg md:block lg:hidden"
+          aria-label="Open Sidebar"
+        >
+          <PanelLeft className="h-5 w-5" />
+        </button>
+      )}
+
+      {/* Sidebar */}
       <div
         className={`
           ${isMobile
@@ -43,14 +69,13 @@ export default function AppSidebar({
           ${!isOpen ? "-translate-x-full" : "translate-x-0"}
           bg-[#1A1F35]
           border-r border-[#2D3748]
+          md:translate-x-0 lg:translate-x-0
         `}
-        style={{
-          width: sidebarWidth,
-        }}
+        style={{ width: sidebarWidth }}
         aria-hidden={!isOpen}
       >
-        {/* Sidebar Content */}
         <div className="flex flex-col w-full h-screen overflow-y-auto">
+
           {/* Header */}
           <div className="p-4 border-b border-[#2D3748]">
             <div className="flex items-center justify-between">
@@ -60,12 +85,22 @@ export default function AppSidebar({
                 </div>
                 <span className="text-lg font-semibold text-white">Unicq.ai</span>
               </div>
+
+              {/* Close Button */}
+              <button
+                onClick={onToggle}
+                className="p-1.5 rounded-md text-white hover:bg-[#2D3748] transition-colors md:block lg:hidden"
+                aria-label="Close Sidebar"
+              >
+                <PanelLeft className="h-5 w-5" />
+              </button>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="flex-1 px-4 py-6 overflow-y-auto">
             <div className="space-y-8">
+
               {/* Products Section */}
               <div className="space-y-4">
                 <h3 className="px-3 text-sm font-medium text-[#A0AEC0]">
@@ -73,20 +108,83 @@ export default function AppSidebar({
                 </h3>
 
                 <div className="space-y-1">
-                  {[
-                    { src: "/side1.png", label: "Analyse Writing" },
-                    { src: "/side2.png", label: "Content Generator" },
-                    { src: "/side3.png", label: "Plagiarism Checker" },
-                    { src: "/side4.png", label: "Humanizer" },
-                  ].map((item, i) => (
-                    <a
-                      key={i}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer"
+                  {/* Analyse Writing */}
+                  <button
+                    onClick={() => handleProductClick("Analyse Writing")}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
+                  >
+                    <img
+                      src="/side1.png"
+                      className="h-[22px] w-[22px]"
+                      alt="Analyse Writing"
+                    />
+                    <span className="flex-1">
+                      Analyse Writing
+                    </span>
+                  </button>
+
+                  {/* Content Generator */}
+                  <button
+                    onClick={() => handleProductClick("Content Generator")}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
+                  >
+                    <img
+                      src="/side2.png"
+                      className="h-[22px] w-[22px]"
+                      alt="Content Generator"
+                    />
+                    <span className="flex-1">
+                      Content Generator
+                    </span>
+                  </button>
+
+                  {/* Plagiarism Checker */}
+                  <button
+                    onClick={() => handleProductClick("Plagiarism Checker")}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
+                  >
+                    <img
+                      src="/side3.png"
+                      className="h-[22px] w-[22px]"
+                      alt="Plagiarism Checker"
+                    />
+                    <span className="flex-1">
+                      Plagiarism Checker
+                    </span>
+                  </button>
+
+                  {/* Humanizer */}
+                  {/* Humanizer */}
+                  <div className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Humanizer button clicked');
+                        handleProductClick("Humanizer");
+                      }}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left xl:cursor-pointer"
                     >
-                      <img src={item.src} className="h-[22px] w-[22px]" alt={item.label} />
-                      <span>{item.label}</span>
-                    </a>
-                  ))}
+                      <img
+                        src="/side4.png"
+                        className="h-[22px] w-[22px]"
+                        alt="Humanizer"
+                      />
+                      <span className="flex-1 xl:cursor-pointer">
+                        Humanizer
+                      </span>
+                    </button>
+                    {/* Safety overlay for XL screens only */}
+                    <div
+                      className="absolute inset-0 hidden xl:block cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('XL overlay clicked');
+                        handleProductClick("Humanizer");
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -97,7 +195,9 @@ export default function AppSidebar({
                 {["How to Use", "Blogs", "FAQs", "Buy us a Coffee", "Contact Sales"].map((label, i) => (
                   <a
                     key={i}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer"
+                    href="#"
+                    onClick={(e) => e.preventDefault()}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full"
                   >
                     {label}
                   </a>
@@ -115,6 +215,7 @@ export default function AppSidebar({
               <span className="text-sm text-white">Hannah ...</span>
             </div>
           </div>
+
         </div>
       </div>
 

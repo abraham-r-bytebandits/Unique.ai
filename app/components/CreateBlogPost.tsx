@@ -20,6 +20,7 @@ type Tone = (typeof TONES)[number]
 // Add the props interface
 interface CreateBlogPostProps {
     onNavigateToContent?: () => void
+    onSectionChange?: () => void
 }
 
 export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostProps) {
