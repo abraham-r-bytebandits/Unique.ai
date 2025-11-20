@@ -47,11 +47,11 @@ export default function AppSidebar({
         />
       )}
 
-      {/* Menu Button outside sidebar */}
+      {/* Menu Button (visible only when sidebar is closed) */}
       {!isOpen && (
         <button
           onClick={onToggle}
-          className="fixed top-4 left-4 z-50 p-2 rounded-md bg-[#1A1F35] text-white hover:bg-[#2D3748] transition-colors shadow-lg md:block lg:hidden"
+          className="fixed top-4 left-4 z-50 p-2 rounded-md bg-[#1A1F35] text-white hover:bg-[#2D3748] transition-colors shadow-lg xl:hidden"
           aria-label="Open Sidebar"
         >
           <PanelLeft className="h-5 w-5" />
@@ -61,19 +61,25 @@ export default function AppSidebar({
       {/* Sidebar */}
       <div
         className={`
-          ${isMobile
+    ${isMobile
             ? "fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out"
             : "fixed"
           }
-          h-screen
-          ${!isOpen ? "-translate-x-full" : "translate-x-0"}
-          bg-[#1A1F35]
-          border-r border-[#2D3748]
-          md:translate-x-0 lg:translate-x-0
-        `}
+    h-screen
+
+    /* Mobile, sm, md, lg → open/close */
+    ${!isOpen ? "-translate-x-full" : "translate-x-0"}
+
+    /* xl → always open */
+    xl:translate-x-0
+
+    bg-[#1A1F35]
+    border-r border-[#2D3748]
+  `}
         style={{ width: sidebarWidth }}
         aria-hidden={!isOpen}
       >
+
         <div className="flex flex-col w-full h-screen overflow-y-auto">
 
           {/* Header */}
@@ -89,7 +95,7 @@ export default function AppSidebar({
               {/* Close Button */}
               <button
                 onClick={onToggle}
-                className="p-1.5 rounded-md text-white hover:bg-[#2D3748] transition-colors md:block lg:hidden"
+                className="p-1.5 rounded-md text-white hover:bg-[#2D3748] transition-colors lg:hidden"
                 aria-label="Close Sidebar"
               >
                 <PanelLeft className="h-5 w-5" />
@@ -103,9 +109,7 @@ export default function AppSidebar({
 
               {/* Products Section */}
               <div className="space-y-4">
-                <h3 className="px-3 text-sm font-medium text-[#A0AEC0]">
-                  Products
-                </h3>
+                <h3 className="px-3 text-sm font-medium text-[#A0AEC0]">Products</h3>
 
                 <div className="space-y-1">
                   {/* Analyse Writing */}
@@ -113,14 +117,8 @@ export default function AppSidebar({
                     onClick={() => handleProductClick("Analyse Writing")}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
                   >
-                    <img
-                      src="/side1.png"
-                      className="h-[22px] w-[22px]"
-                      alt="Analyse Writing"
-                    />
-                    <span className="flex-1">
-                      Analyse Writing
-                    </span>
+                    <img src="/side1.png" className="h-[22px] w-[22px]" />
+                    <span className="flex-1">Analyse Writing</span>
                   </button>
 
                   {/* Content Generator */}
@@ -128,14 +126,8 @@ export default function AppSidebar({
                     onClick={() => handleProductClick("Content Generator")}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
                   >
-                    <img
-                      src="/side2.png"
-                      className="h-[22px] w-[22px]"
-                      alt="Content Generator"
-                    />
-                    <span className="flex-1">
-                      Content Generator
-                    </span>
+                    <img src="/side2.png" className="h-[22px] w-[22px]" />
+                    <span className="flex-1">Content Generator</span>
                   </button>
 
                   {/* Plagiarism Checker */}
@@ -143,44 +135,30 @@ export default function AppSidebar({
                     onClick={() => handleProductClick("Plagiarism Checker")}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
                   >
-                    <img
-                      src="/side3.png"
-                      className="h-[22px] w-[22px]"
-                      alt="Plagiarism Checker"
-                    />
-                    <span className="flex-1">
-                      Plagiarism Checker
-                    </span>
+                    <img src="/side3.png" className="h-[22px] w-[22px]" />
+                    <span className="flex-1">Plagiarism Checker</span>
                   </button>
 
-                  {/* Humanizer */}
                   {/* Humanizer */}
                   <div className="relative">
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Humanizer button clicked');
                         handleProductClick("Humanizer");
                       }}
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left xl:cursor-pointer"
                     >
-                      <img
-                        src="/side4.png"
-                        className="h-[22px] w-[22px]"
-                        alt="Humanizer"
-                      />
-                      <span className="flex-1 xl:cursor-pointer">
-                        Humanizer
-                      </span>
+                      <img src="/side4.png" className="h-[22px] w-[22px]" />
+                      <span className="flex-1 xl:cursor-pointer">Humanizer</span>
                     </button>
-                    {/* Safety overlay for XL screens only */}
+
+                    {/* XL overlay for extended interaction */}
                     <div
                       className="absolute inset-0 hidden xl:block cursor-pointer"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('XL overlay clicked');
                         handleProductClick("Humanizer");
                       }}
                     />
