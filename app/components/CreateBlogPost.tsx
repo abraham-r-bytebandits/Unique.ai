@@ -92,6 +92,21 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
         }, 1000)
     }
 
+    const handleGenerate = () => {
+        setIsProcessing(true)
+
+        setTimeout(() => {
+            const result = analyzeText("sample text")
+            setDocumentTitle(result.title)
+            setAnalysis(result)
+
+            const gen = generateBlogPost(blogTitleInput || result.title, selectedTone, "sample text")
+            setBlogContent(gen)
+
+            setIsProcessing(false)
+        }, 1000)
+    }
+
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(blogContent)
@@ -173,7 +188,7 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
             <div
                 className="bg-white rounded-2xl border border-gray-200 relative overflow-hidden
           ring-4 ring-[#3964FE]/30 shadow-[0_6px_0_rgba(57,100,254,0.06)]"
-                style={{ minHeight: '400px' }}
+                style={{ minHeight: '514px' }}
             >
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <div className="text-sm text-gray-700"></div>
@@ -201,19 +216,19 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
                     </div>
                 </div>
 
-                <div className="p-6 h-[calc(360px-64px)] overflow-auto">
+                <div className="p-6 h-[calc(360px-64px)] overflow-auto scroll-smooth">
                     {!blogContent ? (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
                             <div className="text-center">
                                 <div className="text-lg font-medium mb-2">Your generated blog will appear here</div>
-                                <div className="text-sm">Click <span className="font-medium">Decode My DNA</span> to create a post based on your sample and tone.</div>
+                                <div className="text-sm">Click <span className="font-medium">Generate</span> to create a post based on your topic and tone.</div>
                             </div>
                         </div>
                     ) : (
-                        <article className="prose prose-sm max-w-none">
+                        <article className="prose prose-sm max-w-none prose-headings:mt-0">
                             {blogContent.split('\n').map((line, idx) => {
                                 if (line.startsWith('**') && line.endsWith('**')) {
-                                    return <h3 key={idx} className="mt-0">{line.replace(/\*\*/g, '')}</h3>
+                                    return <h3 key={idx} className="text-[30px]">{line.replace(/\*\*/g, '')}</h3>
                                 }
                                 return <p key={idx}>{line}</p>
                             })}
@@ -248,7 +263,7 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
                                                 </div>
 
                                                 {/* Input + half-overlapping Button */}
-                                                <div className="relative w-full">
+                                                <div className="relative w-full mt-4">
                                                     <input
                                                         ref={blogTitleRef}
                                                         value={blogTitleInput}
@@ -259,11 +274,20 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
                                                     />
 
                                                     <button
+                                                        onClick={handleGenerate}
+                                                        disabled={isProcessing}
                                                         className="absolute right-2 -top-9 translate-y-1/2 
           inline-flex items-center gap-2 px-5 py-2 rounded-md 
-          bg-[#3964FE] text-white text-sm hover:shadow-md"
+          bg-[#3964FE] text-white text-sm hover:shadow-md disabled:opacity-50"
                                                     >
-                                                        Generate
+                                                        {isProcessing ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                                Generating...
+                                                            </div>
+                                                        ) : (
+                                                            <span>Generate</span>
+                                                        )}
                                                     </button>
                                                 </div>
                                             </div>
