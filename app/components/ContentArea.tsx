@@ -173,17 +173,17 @@ const ContentArea = forwardRef<ContentAreaRef, ContentAreaProps>(({
 
   return (
     <div className="bg-white text-gray-900">
-      <div className="flex lg:min-h-screen">
-        <main className="flex-1 md:p-6 flex justify-center">
+      <div className="flex">
+        <main className="flex-1 md:p-6 h-[74vh] flex justify-center">
           <div className="w-full max-w-7xl">
             <div className="space-y-6">
               <div>
-                <CardHeader className='px-0 lg:px-6'>
+                <CardHeader className='px-0 lg:px-8'>
                   <CardDescription className="text-sm md:text-base font-bold text-[#737373] text-left">{documentTitle}</CardDescription>
                   <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] font-medium text-left">Create Authentic Content</CardTitle>
                 </CardHeader>
 
-                <CardContent className="space-y-6 px-0 lg:px-6">
+                <CardContent className="space-y-6 px-0 lg:px-8">
                   <p className="text-[14px] md:text-[16px] lg:text-[18px] text-[#333333] text-left">
                     Paste a sample of your own writing{" "}
                     <span className="text-[#3964FE] font-medium">(minimum 40 words)</span>.<br className="hidden md:block" />

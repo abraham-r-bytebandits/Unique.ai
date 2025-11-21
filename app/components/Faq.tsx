@@ -54,7 +54,7 @@ const faqData = [
 
 const Faq = ({ }: FaqProps) => {
     return (
-        <div className="h-full w-full lg:p-12">
+        <div className="h-full w-full lg:p-14">
             <h2 className="text-[24px] md:text-[30px] lg:text-[40px] xl:text-[50px] font-medium">FAQ</h2>
 
             <Accordion type="single" collapsible className="w-full space-y-6 mt-6 lg:mt-8">

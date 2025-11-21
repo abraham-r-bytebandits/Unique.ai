@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { PanelLeft, Plus, Clock, X, Trash2 } from 'lucide-react'
+import { PanelLeft, Plus, Clock, X } from 'lucide-react'
 
 interface SidebarAddBoxProps {
     onAdd: (val: string) => void
@@ -11,8 +11,8 @@ interface SidebarAddBoxProps {
     sidebarWidth: number
     onToggleSidebar: () => void
     onNewChat: () => void
-    onDeleteHistory?: (index: number) => void // Add delete handler
-    onClearHistory?: () => void // Add clear all handler
+    onDeleteHistory?: (index: number) => void
+    onClearHistory?: () => void
 }
 
 const GAP = 2
@@ -81,12 +81,6 @@ export default function SidebarAddBox({
         }
     }
 
-    const handleToggleMainSidebar = (e: React.MouseEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
-        onToggleSidebar()
-    }
-
     const floatingStyle: React.CSSProperties = {
         left: openHistory
             ? `${sidebarWidth + HISTORY_WIDTH + GAP}px`
@@ -102,9 +96,9 @@ export default function SidebarAddBox({
 
     return (
         <>
-            {/* Floating Buttons - Always show but adjust positioning */}
+            {/* Floating Buttons - Higher z-index to stay above blur */}
             <div
-                className="fixed top-1/4 z-30 transition-all duration-300"
+                className="fixed top-[14%] z-50 transition-all duration-300"
                 style={{
                     transform: 'translateY(-50%)',
                     ...floatingStyle
@@ -135,10 +129,22 @@ export default function SidebarAddBox({
                 </div>
             </div>
 
-            {/* Sliding History Drawer */}
+            {/* Blur Overlay for Desktop - Only covers main content area */}
+            {!isMobile && openHistory && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm z-40"
+                    style={{
+                        // Exclude sidebar area from the blur overlay
+                        left: `${sidebarWidth}px`,
+                    }}
+                    onClick={() => setOpenHistory(false)}
+                />
+            )}
+
+            {/* Sliding History Drawer - Higher z-index */}
             <div
                 ref={panelRef}
-                className="fixed top-[25%] h-screen z-40 transition-all duration-300 bg-white"
+                className="fixed top-[10%] h-screen z-50 transition-all duration-300"
                 style={{
                     ...(isMobile
                         ? { width: "100vw", left: 0 }
@@ -150,11 +156,11 @@ export default function SidebarAddBox({
                     pointerEvents: openHistory ? 'auto' : 'none',
                 }}
             >
-                <div className="h-full bg-white border-r shadow-2xl flex flex-col">
+                <div className="h-full bg-black bg-opacity-10 shadow-2xl flex flex-col">
 
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b">
-                        <h3 className="text-sm font-semibold">History</h3>
+                    <div className="flex items-center justify-between p-4">
+                        <h3 className="text-sm text-[#000000] font-semibold">History</h3>
                         {history.length > 0 && (
                             <button
                                 onClick={handleClearAll}
@@ -168,7 +174,7 @@ export default function SidebarAddBox({
                     {/* Saved Items */}
                     <div className="flex-1 p-2 overflow-y-auto">
                         {history.length === 0 ? (
-                            <p className="text-sm text-gray-500 text-center py-4">No history yet</p>
+                            <p className="text-sm text-[#000000] text-center py-4">No history yet</p>
                         ) : (
                             history.map((item, i) => (
                                 <div
@@ -198,7 +204,7 @@ export default function SidebarAddBox({
             {/* Overlay for history on mobile */}
             {isMobile && openHistory && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-30"
+                    className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
                     onClick={() => setOpenHistory(false)}
                 />
             )}

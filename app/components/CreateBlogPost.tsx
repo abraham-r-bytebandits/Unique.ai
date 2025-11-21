@@ -291,10 +291,10 @@ const CreateBlogPost = forwardRef<CreateBlogPostRef, CreateBlogPostProps>(({
     )
 
     return (
-        <div className={`min-h-screen bg-white text-gray-900 ${isAssistantOpen ? 'overflow-hidden' : ''}`}>
+        <div className={`bg-white text-gray-900 ${isAssistantOpen ? 'overflow-hidden' : ''}`}>
             <div className={`${isAssistantOpen ? 'blur-sm pointer-events-none' : ''} transition-all duration-300`}>
-                <div className="flex min-h-screen">
-                    <main className="flex-1 md:p-6 flex justify-center">
+                <div className="flex">
+                    <main className="flex-1 p-4 md:p-6 flex justify-center">
                         <div className="w-full max-w-[1300px]">
                             <div className="space-y-6">
                                 <div>

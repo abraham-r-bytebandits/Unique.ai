@@ -23,8 +23,8 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
         "h-[70px] w-[70px] bg-[#E3E8FE] rounded-xl flex flex-col items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition border cursor-pointer"
 
     return (
-        <div className="w-full lg:pl-12">
-            <div className="flex flex-col lg:flex-row items-center gap-10 min-h-screen">
+        <div className="w-full lg:pl-14">
+            <div className="flex flex-col lg:flex-row items-center gap-10">
 
                 {/* LEFT SECTION */}
                 <div className="flex-1 w-full">
