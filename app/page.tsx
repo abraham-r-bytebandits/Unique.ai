@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar"
 import AppSidebar from './components/Sidebar'
-import ContentArea from './components/ContentArea'
-import CreateBlogPost from './components/CreateBlogPost'
+import ContentArea, { ContentAreaRef } from './components/ContentArea'
+import CreateBlogPost, { CreateBlogPostRef } from './components/CreateBlogPost'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import Header from './components/Header'
 import GiftCoffee from './components/GiftCoffee'
@@ -27,22 +27,75 @@ interface AssistantPanelProps {
   onTabChange: (tab: 'plagiarism' | 'humanizer') => void
 }
 
+// Local storage keys
+const HISTORY_STORAGE_KEY = 'unicq-ai-history'
+const MAX_HISTORY_ITEMS = 20
+
 export default function Home() {
-  const [history, setHistory] = useState(["Solopre…", "Byteband…", "History 1…"])
+  const [history, setHistory] = useState<string[]>([])
+
+  // Load history from localStorage on component mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY)
+    if (savedHistory) {
+      try {
+        const parsedHistory = JSON.parse(savedHistory)
+        setHistory(Array.isArray(parsedHistory) ? parsedHistory : [])
+      } catch (error) {
+        console.error('Error parsing history from localStorage:', error)
+        setHistory([])
+      }
+    }
+  }, [])
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history))
+  }, [history])
 
   const handleAddItem = (newItem: string) => {
     if (!newItem.trim()) return
-    setHistory(prev => [newItem, ...prev])
+
+    setHistory(prev => {
+      // Remove duplicates and keep only the latest occurrence
+      const filtered = prev.filter(item => item !== newItem)
+      // Add new item to the beginning and limit to max items
+      const updated = [newItem, ...filtered].slice(0, MAX_HISTORY_ITEMS)
+      return updated
+    })
+  }
+
+  const handleDeleteHistory = (index: number) => {
+    setHistory(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleClearHistory = () => {
+    setHistory([])
   }
 
   return (
     <SidebarProvider>
-      <HomeContent history={history} onAddItem={handleAddItem} />
+      <HomeContent
+        history={history}
+        onAddItem={handleAddItem}
+        onDeleteHistory={handleDeleteHistory}
+        onClearHistory={handleClearHistory}
+      />
     </SidebarProvider>
   )
 }
 
-function HomeContent({ history, onAddItem }: { history: string[], onAddItem: (item: string) => void }) {
+function HomeContent({
+  history,
+  onAddItem,
+  onDeleteHistory,
+  onClearHistory
+}: {
+  history: string[]
+  onAddItem: (item: string) => void
+  onDeleteHistory: (index: number) => void
+  onClearHistory: () => void
+}) {
   const { open, setOpen } = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
 
@@ -51,6 +104,10 @@ function HomeContent({ history, onAddItem }: { history: string[], onAddItem: (it
   const contentAreaRef = useRef<HTMLDivElement>(null)
   const giftCoffeeRef = useRef<HTMLDivElement>(null)
   const faqRef = useRef<HTMLDivElement>(null)
+
+  // Refs for reset functionality
+  const contentAreaComponentRef = useRef<ContentAreaRef>(null)
+  const createBlogPostComponentRef = useRef<CreateBlogPostRef>(null)
 
   const prevIsMobileRef = useRef<boolean | null>(null)
 
@@ -70,6 +127,80 @@ function HomeContent({ history, onAddItem }: { history: string[], onAddItem: (it
   const closeAssistant = () => {
     setIsAssistantOpen(false)
     setActiveTab(null)
+  }
+
+  // Enhanced function to extract first two meaningful words
+  const extractFirstTwoWords = (content: string): string => {
+    if (!content.trim()) return ''
+
+    // Remove markdown formatting, special characters, and extra whitespace
+    const cleanContent = content
+      .replace(/\*\*/g, '')           // Remove bold markers
+      .replace(/#/g, '')              // Remove heading markers
+      .replace(/[^\w\s]/g, ' ')       // Replace punctuation with spaces
+      .replace(/\s+/g, ' ')           // Collapse multiple spaces
+      .trim()
+      .toLowerCase()
+
+    // Common stop words to exclude
+    const stopWords = new Set([
+      'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+      'of', 'with', 'by', 'as', 'is', 'was', 'are', 'were', 'be', 'been',
+      'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+      'could', 'should', 'may', 'might', 'must', 'can', 'shall'
+    ])
+
+    // Split by whitespace and filter out stop words and empty strings
+    const words = cleanContent
+      .split(/\s+/)
+      .filter(word => word.length > 0 && !stopWords.has(word))
+
+    // Take first two meaningful words
+    if (words.length >= 2) {
+      // Capitalize first letter of each word
+      const capitalizedWords = words.slice(0, 2).map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+      )
+      return capitalizedWords.join(' ') + '…'
+    } else if (words.length === 1) {
+      const capitalizedWord = words[0].charAt(0).toUpperCase() + words[0].slice(1)
+      return capitalizedWord + '…'
+    }
+
+    // Fallback: if no meaningful words found, use first two actual words
+    const fallbackWords = cleanContent.split(/\s+/).filter(word => word.length > 0)
+    if (fallbackWords.length >= 2) {
+      const capitalizedWords = fallbackWords.slice(0, 2).map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+      )
+      return capitalizedWords.join(' ') + '…'
+    } else if (fallbackWords.length === 1) {
+      const capitalizedWord = fallbackWords[0].charAt(0).toUpperCase() + fallbackWords[0].slice(1)
+      return capitalizedWord + '…'
+    }
+
+    return 'New Post…'
+  }
+
+  // Function to handle new chat
+  const handleNewChat = () => {
+    console.log('Starting new chat...');
+
+    // Reset analysis data
+    setAnalysis(null);
+
+    // Reset content area
+    if (contentAreaComponentRef.current) {
+      contentAreaComponentRef.current.resetContent();
+    }
+
+    // Reset blog post
+    if (createBlogPostComponentRef.current) {
+      createBlogPostComponentRef.current.resetContent();
+    }
+
+    // Scroll to content area to start fresh
+    scrollToContent();
   }
 
   useEffect(() => {
@@ -363,9 +494,12 @@ function HomeContent({ history, onAddItem }: { history: string[], onAddItem: (it
         isOpen={open}
         history={history}
         onAddItem={onAddItem}
+        onDeleteHistory={onDeleteHistory}
+        onClearHistory={onClearHistory}
         isMobile={isMobile}
         onToggle={toggleSidebar}
         onOpenAssistant={openAssistant}
+        onNewChat={handleNewChat}
       />
 
       {/* MAIN CONTENT WRAPPER */}
@@ -411,6 +545,7 @@ function HomeContent({ history, onAddItem }: { history: string[], onAddItem: (it
               {/* Content Writing Area */}
               <div ref={contentAreaRef}>
                 <ContentArea
+                  ref={contentAreaComponentRef}
                   onNavigateToBlogPost={scrollToBlogPost}
                   onAnalysisComplete={handleAnalysisComplete}
                 />
@@ -419,11 +554,20 @@ function HomeContent({ history, onAddItem }: { history: string[], onAddItem: (it
               {/* Mobile Right Sidebar */}
               <MobileRightSidebar />
 
+              {/* BOTTOM CARD — MOBILE */}
+              <Card className="bg-[#D9D9D9] h-[160px] block lg:hidden border-gray-200 mt-6">
+                <CardContent className="p-6">
+                  <div className="text-center text-gray-500"></div>
+                </CardContent>
+              </Card>
+
               {/* Blog Post Section */}
               <div ref={blogPostSectionRef}>
                 <CreateBlogPost
+                  ref={createBlogPostComponentRef}
                   onNavigateToContent={scrollToContent}
                   onSectionChange={() => setCurrentSection("blog")}
+                  onAddToHistory={onAddItem}
                 />
               </div>
 

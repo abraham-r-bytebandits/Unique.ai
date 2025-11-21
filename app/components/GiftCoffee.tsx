@@ -24,13 +24,13 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
 
     return (
         <div className="w-full lg:pl-12">
-            <div className="flex flex-col lg:flex-row items-center gap-10 h-screen">
+            <div className="flex flex-col lg:flex-row items-center gap-10 min-h-screen">
 
                 {/* LEFT SECTION */}
-                <div className="flex-1">
+                <div className="flex-1 w-full">
 
                     <CardHeader className="px-0">
-                        <CardTitle className="text-[24px] md:text-[30px] lg:text-[40px] font-medium xl:text-[50px]">
+                        <CardTitle className="text-[22px] md:text-[30px] lg:text-[40px] xl:text-[50px] font-medium">
                             Gift a cup of Coffee
                         </CardTitle>
                     </CardHeader>
@@ -47,7 +47,7 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
                         </p>
 
                         {/* COFFEE BUTTONS */}
-                        <div className="flex gap-4">
+                        <div className="flex flex-wrap gap-3 sm:gap-4">
                             {cupOptions.map((item) => (
                                 <button
                                     key={item.cups}
@@ -55,7 +55,7 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
                                     className={`${baseStyle} ${selected === item.cups ? "border-black" : "border-transparent"
                                         }`}
                                 >
-                                    <span className="text-xl font-semibold">{item.cups}</span>
+                                    <span className="text-lg sm:text-xl font-semibold">{item.cups}</span>
                                     <span className="text-xs">Rs.{item.price}</span>
                                 </button>
                             ))}
@@ -64,13 +64,12 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
                         {/* INPUT BOX */}
                         <input
                             type="text"
-                            className="w-[300px] h-[50px] rounded-md border border-black px-4 text-black"
+                            placeholder="Enter amount"
+                            className="w-full h-[48px] rounded-md border border-black px-4 text-black"
                         />
 
-                        <br />
-
                         {/* DONATE BUTTON */}
-                        <button className="px-6 py-2 bg-[#1A1F35] text-white rounded-md shadow-md">
+                        <button className="px-6 py-2 bg-[#1A1F35] text-white rounded-md shadow-md w-full max-w-[104px]">
                             Donate
                         </button>
 
@@ -78,11 +77,11 @@ const GiftCoffee = ({ onNavigateToContent, onSectionChange }: GiftCoffeeProps) =
                 </div>
 
                 {/* RIGHT IMAGE SECTION */}
-                <div className="flex-1 flex justify-center lg:justify-center">
+                <div className="flex-1 flex justify-center">
                     <img
                         src="/coffee.png"
                         alt="Coffee Cup"
-                        className="rounded-2xl max-w-[420px] w-full"
+                        className="rounded-2xl w-full"
                     />
                 </div>
             </div>

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, ChangeEvent, useRef } from 'react'
+import { useState, ChangeEvent, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "sonner";
+import { toast } from "sonner"
 
 
 interface AnalysisResult {
@@ -22,15 +22,27 @@ interface ContentAreaProps {
   onAnalysisComplete?: (analysis: AnalysisResult) => void
 }
 
-export default function ContentArea({
+export interface ContentAreaRef {
+  resetContent: () => void
+}
+
+const ContentArea = forwardRef<ContentAreaRef, ContentAreaProps>(({
   onNavigateToBlogPost,
   onAnalysisComplete,
-}: ContentAreaProps) {
+}: ContentAreaProps, ref) => {
   const [text, setText] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [documentTitle, setDocumentTitle] = useState('Untitled document')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    resetContent: () => {
+      setText('')
+      setWordCount(0)
+      setDocumentTitle('Untitled document')
+    }
+  }))
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
@@ -263,4 +275,8 @@ export default function ContentArea({
       </div>
     </div>
   )
-}
+})
+
+ContentArea.displayName = 'ContentArea'
+
+export default ContentArea

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from '@/components/ui/button'
 
@@ -21,9 +21,18 @@ type Tone = (typeof TONES)[number]
 interface CreateBlogPostProps {
     onNavigateToContent?: () => void
     onSectionChange?: () => void
+    onAddToHistory?: (title: string) => void // Add this prop
 }
 
-export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostProps) {
+export interface CreateBlogPostRef {
+    resetContent: () => void
+}
+
+const CreateBlogPost = forwardRef<CreateBlogPostRef, CreateBlogPostProps>(({
+    onNavigateToContent,
+    onSectionChange,
+    onAddToHistory
+}: CreateBlogPostProps, ref) => {
     const blogTitleRef = useRef<HTMLInputElement | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
@@ -33,6 +42,36 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
     const [blogContent, setBlogContent] = useState<string>('')
     const [blogTitleInput, setBlogTitleInput] = useState<string>('')
     const [activeTab, setActiveTab] = useState('plagiarism')
+
+    useImperativeHandle(ref, () => ({
+        resetContent: () => {
+            setBlogContent('')
+            setBlogTitleInput('')
+            setAnalysis(null)
+            setDocumentTitle('Untitled document')
+            setSelectedTone('Informational')
+        }
+    }))
+
+    // Function to extract first two words from content
+    const extractFirstTwoWords = (content: string): string => {
+        if (!content.trim()) return ''
+
+        // Remove markdown formatting and get clean text
+        const cleanContent = content.replace(/\*\*/g, '').replace(/#/g, '').trim()
+
+        // Split by whitespace and filter out empty strings
+        const words = cleanContent.split(/\s+/).filter(word => word.length > 0)
+
+        // Take first two words and add ellipsis if there are more words
+        if (words.length >= 2) {
+            return words.slice(0, 2).join(' ') + '…'
+        } else if (words.length === 1) {
+            return words[0] + '…'
+        }
+
+        return ''
+    }
 
     const scrollToTitleInput = () => {
         if (blogTitleRef.current) {
@@ -103,6 +142,12 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
             const gen = generateBlogPost(blogTitleInput || result.title, selectedTone, "sample text")
             setBlogContent(gen)
 
+            // Extract first two words and add to history
+            const historyTitle = extractFirstTwoWords(gen)
+            if (historyTitle && onAddToHistory) {
+                onAddToHistory(historyTitle)
+            }
+
             setIsProcessing(false)
         }, 1000)
     }
@@ -126,6 +171,12 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
         a.click()
         a.remove()
         URL.revokeObjectURL(url)
+
+        // Also add to history when saving
+        const historyTitle = extractFirstTwoWords(blogContent)
+        if (historyTitle && onAddToHistory) {
+            onAddToHistory(historyTitle)
+        }
     }
 
     const toggleTone = (t: Tone) => {
@@ -243,7 +294,7 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
         <div className={`min-h-screen bg-white text-gray-900 ${isAssistantOpen ? 'overflow-hidden' : ''}`}>
             <div className={`${isAssistantOpen ? 'blur-sm pointer-events-none' : ''} transition-all duration-300`}>
                 <div className="flex min-h-screen">
-                    <main className="flex-1 p-4 md:p-6 flex justify-center">
+                    <main className="flex-1 md:p-6 flex justify-center">
                         <div className="w-full max-w-[1300px]">
                             <div className="space-y-6">
                                 <div>
@@ -313,4 +364,8 @@ export default function CreateBlogPost({ onNavigateToContent }: CreateBlogPostPr
             </div>
         </div>
     )
-}
+})
+
+CreateBlogPost.displayName = 'CreateBlogPost'
+
+export default CreateBlogPost

@@ -41,6 +41,14 @@ const faqData = [
     {
         q: "Does it support SEO content writing?",
         a: "Yes, but this feature is available only in paid plans. Premium users can access advanced SEO optimization tools—ensuring ideal keyword density, readability, and ranking performance across major search engines."
+    },
+    {
+        q: "Who can use this tool?",
+        a: "It’s ideal for content creators, marketers, agencies, bloggers, students, and brands that want to maintain originality while scaling content output."
+    },
+    {
+        q: "How is my data handled?",
+        a: "All your generated content and entered data remain private, encrypted, and never reused for model training. Your confidentiality and security are always prioritized."
     }
 ];
 

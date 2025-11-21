@@ -1,8 +1,7 @@
-// SidebarAddBox.tsx
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { PanelLeft, Plus, Clock, X } from 'lucide-react'
+import { PanelLeft, Plus, Clock, X, Trash2 } from 'lucide-react'
 
 interface SidebarAddBoxProps {
     onAdd: (val: string) => void
@@ -11,6 +10,9 @@ interface SidebarAddBoxProps {
     isMobile?: boolean
     sidebarWidth: number
     onToggleSidebar: () => void
+    onNewChat: () => void
+    onDeleteHistory?: (index: number) => void // Add delete handler
+    onClearHistory?: () => void // Add clear all handler
 }
 
 const GAP = 2
@@ -23,7 +25,10 @@ export default function SidebarAddBox({
     isMainSidebarOpen,
     isMobile = false,
     sidebarWidth,
-    onToggleSidebar
+    onToggleSidebar,
+    onNewChat,
+    onDeleteHistory,
+    onClearHistory
 }: SidebarAddBoxProps) {
 
     const [openHistory, setOpenHistory] = useState(false)
@@ -58,20 +63,36 @@ export default function SidebarAddBox({
         setOpenHistory(false)
     }
 
-    // defensive: stop propagation + preventDefault, then toggle via parent
+    const handleNewChat = () => {
+        onNewChat()
+        setOpenHistory(false)
+    }
+
+    const handleDeleteItem = (index: number, e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (onDeleteHistory) {
+            onDeleteHistory(index)
+        }
+    }
+
+    const handleClearAll = () => {
+        if (onClearHistory) {
+            onClearHistory()
+        }
+    }
+
     const handleToggleMainSidebar = (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         onToggleSidebar()
     }
 
-    // ⬅⬅⬅ UPDATED POSITION LOGIC (IMPORTANT)
     const floatingStyle: React.CSSProperties = {
         left: openHistory
-            ? `${sidebarWidth + HISTORY_WIDTH + GAP}px`   // button shifts to outside of history drawer
+            ? `${sidebarWidth + HISTORY_WIDTH + GAP}px`
             : isMainSidebarOpen
-                ? `${sidebarWidth + GAP}px`               // button sits next to main sidebar
-                : `${GAP}px`,                             // default position
+                ? `${sidebarWidth + GAP}px`
+                : `${GAP}px`,
     }
 
     const panelStyle: React.CSSProperties = {
@@ -81,9 +102,9 @@ export default function SidebarAddBox({
 
     return (
         <>
-            {/* Floating Buttons */}
+            {/* Floating Buttons - Always show but adjust positioning */}
             <div
-                className="fixed top-1/4 z-10 transition-all duration-300"
+                className="fixed top-1/4 z-30 transition-all duration-300"
                 style={{
                     transform: 'translateY(-50%)',
                     ...floatingStyle
@@ -98,15 +119,16 @@ export default function SidebarAddBox({
                             e.stopPropagation()
                             setOpenHistory(true)
                         }}
-                        className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200"
+                        className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-colors"
                         aria-label="Toggle sidebar"
                     >
                         <PanelLeft className="h-4 w-4" />
                     </button>
 
                     <button
-                        className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200"
-                        aria-label="Open history"
+                        onClick={handleNewChat}
+                        className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                        aria-label="New chat"
                     >
                         <Plus className="h-4 w-4" />
                     </button>
@@ -116,7 +138,7 @@ export default function SidebarAddBox({
             {/* Sliding History Drawer */}
             <div
                 ref={panelRef}
-                className="fixed top-[25%] h-screen z-50 transition-all duration-300 bg-white"
+                className="fixed top-[25%] h-screen z-40 transition-all duration-300 bg-white"
                 style={{
                     ...(isMobile
                         ? { width: "100vw", left: 0 }
@@ -125,6 +147,7 @@ export default function SidebarAddBox({
                         ? "translateX(0)"
                         : "translateX(-100%)",
                     opacity: openHistory ? 1 : 0,
+                    pointerEvents: openHistory ? 'auto' : 'none',
                 }}
             >
                 <div className="h-full bg-white border-r shadow-2xl flex flex-col">
@@ -132,6 +155,14 @@ export default function SidebarAddBox({
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 border-b">
                         <h3 className="text-sm font-semibold">History</h3>
+                        {history.length > 0 && (
+                            <button
+                                onClick={handleClearAll}
+                                className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                            >
+                                Clear All
+                            </button>
+                        )}
                     </div>
 
                     {/* Saved Items */}
@@ -142,41 +173,32 @@ export default function SidebarAddBox({
                             history.map((item, i) => (
                                 <div
                                     key={i}
-                                    className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                                    className="group flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer transition-colors min-h-[44px]"
                                     onClick={() => {
                                         setValue(item)
                                         inputRef.current?.focus()
                                     }}
                                 >
-                                    <Clock className="h-4 w-4 text-gray-500" />
-                                    <span className="text-sm truncate">{item}</span>
+                                    <Clock className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                                    <span className="text-sm truncate flex-1">{item}</span>
+                                    <button
+                                        onClick={(e) => handleDeleteItem(i, e)}
+                                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-all duration-200 flex items-center justify-center w-6 h-6"
+                                        title="Delete this item"
+                                    >
+                                        <X className="h-3 w-3 text-red-500" />
+                                    </button>
                                 </div>
                             ))
                         )}
                     </div>
-
-                    {/* Input Box */}
-                    <div className="p-4 border-t">
-                        <p className="text-sm mb-2 font-medium">Add New Item</p>
-                        <div className="flex gap-2">
-                            <input
-                                ref={inputRef}
-                                value={value}
-                                onChange={(e) => setValue(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                                className="flex-1 border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter item..."
-                            />
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
             {/* Overlay for history on mobile */}
             {isMobile && openHistory && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-black bg-opacity-50 z-30"
                     onClick={() => setOpenHistory(false)}
                 />
             )}

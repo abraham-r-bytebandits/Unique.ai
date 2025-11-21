@@ -7,18 +7,24 @@ interface AppSidebarProps {
   isOpen: boolean
   history: string[]
   onAddItem: (newItem: string) => void
+  onDeleteHistory?: (index: number) => void
+  onClearHistory?: () => void
   isMobile: boolean
   onToggle: () => void
   onOpenAssistant: (type: 'plagiarism' | 'humanizer') => void
+  onNewChat: () => void
 }
 
 export default function AppSidebar({
   isOpen,
   history,
   onAddItem,
+  onDeleteHistory,
+  onClearHistory,
   isMobile,
   onToggle,
   onOpenAssistant,
+  onNewChat,
 }: AppSidebarProps) {
 
   const sidebarWidth = isMobile ? 256 : 288
@@ -61,21 +67,21 @@ export default function AppSidebar({
       {/* Sidebar */}
       <div
         className={`
-    ${isMobile
+          ${isMobile
             ? "fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out"
             : "fixed"
           }
-    h-screen
+          h-screen
 
-    /* Mobile, sm, md, lg → open/close */
-    ${!isOpen ? "-translate-x-full" : "translate-x-0"}
+          /* Mobile, sm, md, lg → open/close */
+          ${!isOpen ? "-translate-x-full" : "translate-x-0"}
 
-    /* xl → always open */
-    xl:translate-x-0
+          /* xl → always open */
+          xl:translate-x-0
 
-    bg-[#1A1F35]
-    border-r border-[#2D3748]
-  `}
+          bg-[#1A1F35]
+          border-r border-[#2D3748]
+        `}
         style={{ width: sidebarWidth }}
         aria-hidden={!isOpen}
       >
@@ -115,7 +121,7 @@ export default function AppSidebar({
                   {/* Analyse Writing */}
                   <button
                     onClick={() => handleProductClick("Analyse Writing")}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left min-h-[44px]"
                   >
                     <img src="/side1.png" className="h-[22px] w-[22px]" />
                     <span className="flex-1">Analyse Writing</span>
@@ -124,7 +130,7 @@ export default function AppSidebar({
                   {/* Content Generator */}
                   <button
                     onClick={() => handleProductClick("Content Generator")}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left min-h-[44px]"
                   >
                     <img src="/side2.png" className="h-[22px] w-[22px]" />
                     <span className="flex-1">Content Generator</span>
@@ -133,36 +139,20 @@ export default function AppSidebar({
                   {/* Plagiarism Checker */}
                   <button
                     onClick={() => handleProductClick("Plagiarism Checker")}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left min-h-[44px]"
                   >
                     <img src="/side3.png" className="h-[22px] w-[22px]" />
                     <span className="flex-1">Plagiarism Checker</span>
                   </button>
 
                   {/* Humanizer */}
-                  <div className="relative">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleProductClick("Humanizer");
-                      }}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left xl:cursor-pointer"
-                    >
-                      <img src="/side4.png" className="h-[22px] w-[22px]" />
-                      <span className="flex-1 xl:cursor-pointer">Humanizer</span>
-                    </button>
-
-                    {/* XL overlay for extended interaction */}
-                    <div
-                      className="absolute inset-0 hidden xl:block cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleProductClick("Humanizer");
-                      }}
-                    />
-                  </div>
+                  <button
+                    onClick={() => handleProductClick("Humanizer")}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left min-h-[44px]"
+                  >
+                    <img src="/side4.png" className="h-[22px] w-[22px]" />
+                    <span className="flex-1">Humanizer</span>
+                  </button>
                 </div>
               </div>
 
@@ -171,14 +161,13 @@ export default function AppSidebar({
               {/* Additional Menu Items */}
               <div className="space-y-1">
                 {["How to Use", "Blogs", "FAQs", "Buy us a Coffee", "Contact Sales"].map((label, i) => (
-                  <a
+                  <button
                     key={i}
-                    href="#"
                     onClick={(e) => e.preventDefault()}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left min-h-[44px]"
                   >
-                    {label}
-                  </a>
+                    <span className="flex-1">{label}</span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -186,11 +175,24 @@ export default function AppSidebar({
 
           {/* Footer */}
           <div className="p-4 border-t border-[#2D3748]">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-[#2D3748] flex items-center justify-center">
-                <User className="h-4 w-4 text-[#A0AEC0]" />
+            <div className="flex items-center justify-between px-2">
+              {/* LEFT: User Info */}
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-[#2D3748] flex items-center justify-center">
+                  <User className="h-4 w-4 text-[#A0AEC0]" />
+                </div>
+
+                <span className="text-sm text-white">Hannah ...</span>
               </div>
-              <span className="text-sm text-white">Hannah ...</span>
+
+              {/* RIGHT: Logout Button */}
+              <button className="hover:opacity-80 transition">
+                <img
+                  src="/logout.png"
+                  alt="logout"
+                  className="h-5 w-5 object-contain"
+                />
+              </button>
             </div>
           </div>
 
@@ -205,6 +207,9 @@ export default function AppSidebar({
         isMobile={isMobile}
         sidebarWidth={sidebarWidth}
         onToggleSidebar={onToggle}
+        onNewChat={onNewChat}
+        onDeleteHistory={onDeleteHistory}
+        onClearHistory={onClearHistory}
       />
     </>
   )
