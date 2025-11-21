@@ -220,7 +220,7 @@ function HomeContent({
 
   const toggleSidebar = () => setOpen(!open)
 
-  // Updated scrollToBlogPost to only target the blog post
+  // Scroll functions for all sections
   const scrollToBlogPost = () => {
     if (blogPostSectionRef.current) {
       blogPostSectionRef.current.scrollIntoView({
@@ -238,6 +238,26 @@ function HomeContent({
         block: 'start'
       })
       setCurrentSection('content')
+    }
+  }
+
+  const scrollToGiftCoffee = () => {
+    if (giftCoffeeRef.current) {
+      giftCoffeeRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+      setCurrentSection('giftCoffee')
+    }
+  }
+
+  const scrollToFaq = () => {
+    if (faqRef.current) {
+      faqRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+      setCurrentSection('faq')
     }
   }
 
@@ -412,7 +432,7 @@ function HomeContent({
     )
   }
 
-  // Right Sidebar Components - Conditionally rendered - UPDATED
+  // Right Sidebar Components - Conditionally rendered
   const RightSidebar = () => {
     return (
       <aside className="lg:flex flex-col space-y-6 min-h-0 hidden">
@@ -449,7 +469,7 @@ function HomeContent({
     )
   }
 
-  // Mobile Right Sidebar Components - Conditionally rendered - UPDATED
+  // Mobile Right Sidebar Components - Conditionally rendered
   const MobileRightSidebar = () => {
     // Only show when we're in the content section
     if (currentSection !== 'content') {
@@ -500,6 +520,8 @@ function HomeContent({
         onToggle={toggleSidebar}
         onOpenAssistant={openAssistant}
         onNewChat={handleNewChat}
+        onScrollToGiftCoffee={scrollToGiftCoffee}
+        onScrollToFaq={scrollToFaq}
       />
 
       {/* MAIN CONTENT WRAPPER */}
@@ -522,10 +544,14 @@ function HomeContent({
                 const scrollContainer = e.currentTarget
                 const contentArea = contentAreaRef.current
                 const blogPost = blogPostSectionRef.current
+                const giftCoffee = giftCoffeeRef.current
+                const faq = faqRef.current
 
-                if (contentArea && blogPost) {
+                if (contentArea && blogPost && giftCoffee && faq) {
                   const contentAreaRect = contentArea.getBoundingClientRect()
                   const blogPostRect = blogPost.getBoundingClientRect()
+                  const giftCoffeeRect = giftCoffee.getBoundingClientRect()
+                  const faqRect = faq.getBoundingClientRect()
 
                   const isContentAreaVisible =
                     contentAreaRect.top >= 0 &&
@@ -534,11 +560,21 @@ function HomeContent({
                   const isBlogPostVisible =
                     blogPostRect.top < window.innerHeight * 0.8
 
-                  setCurrentSection(
-                    isContentAreaVisible && !isBlogPostVisible
-                      ? "content"
-                      : "blog"
-                  )
+                  const isGiftCoffeeVisible =
+                    giftCoffeeRect.top < window.innerHeight * 0.8
+
+                  const isFaqVisible =
+                    faqRect.top < window.innerHeight * 0.8
+
+                  if (isContentAreaVisible && !isBlogPostVisible) {
+                    setCurrentSection("content")
+                  } else if (isBlogPostVisible && !isGiftCoffeeVisible) {
+                    setCurrentSection("blog")
+                  } else if (isGiftCoffeeVisible && !isFaqVisible) {
+                    setCurrentSection("giftCoffee")
+                  } else if (isFaqVisible) {
+                    setCurrentSection("faq")
+                  }
                 }
               }}
             >
@@ -575,7 +611,7 @@ function HomeContent({
               <div ref={giftCoffeeRef}>
                 <GiftCoffee
                   onNavigateToContent={scrollToContent}
-                  onSectionChange={() => setCurrentSection("blog")}
+                  onSectionChange={() => setCurrentSection("giftCoffee")}
                 />
               </div>
 
@@ -583,7 +619,7 @@ function HomeContent({
               <div ref={faqRef}>
                 <Faq
                   onNavigateToContent={scrollToContent}
-                  onSectionChange={() => setCurrentSection("blog")}
+                  onSectionChange={() => setCurrentSection("faq")}
                 />
               </div>
             </div>

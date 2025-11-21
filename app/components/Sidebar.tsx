@@ -13,6 +13,8 @@ interface AppSidebarProps {
   onToggle: () => void
   onOpenAssistant: (type: 'plagiarism' | 'humanizer') => void
   onNewChat: () => void
+  onScrollToGiftCoffee: () => void
+  onScrollToFaq: () => void
 }
 
 export default function AppSidebar({
@@ -25,6 +27,8 @@ export default function AppSidebar({
   onToggle,
   onOpenAssistant,
   onNewChat,
+  onScrollToGiftCoffee,
+  onScrollToFaq,
 }: AppSidebarProps) {
 
   const sidebarWidth = isMobile ? 256 : 288
@@ -38,6 +42,14 @@ export default function AppSidebar({
     }
     else if (label === "Humanizer") {
       onOpenAssistant('humanizer')
+      if (isMobile) onToggle()
+    }
+    else if (label === "Buy us a Coffee") {
+      onScrollToGiftCoffee()
+      if (isMobile) onToggle()
+    }
+    else if (label === "FAQs") {
+      onScrollToFaq()
       if (isMobile) onToggle()
     }
   }
@@ -163,7 +175,7 @@ export default function AppSidebar({
                 {["How to Use", "Blogs", "FAQs", "Buy us a Coffee", "Contact Sales"].map((label, i) => (
                   <button
                     key={i}
-                    onClick={(e) => e.preventDefault()}
+                    onClick={() => handleProductClick(label)}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white hover:bg-[#2D3748] transition-colors cursor-pointer w-full text-left min-h-[44px]"
                   >
                     <span className="flex-1">{label}</span>
